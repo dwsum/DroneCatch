@@ -8,6 +8,10 @@
 class cameraControl {
 public:
 
+    double getInitialXVelocity();
+    double getInitialYVelocity();
+    double getInitialZVelocity();
+
 private:
     
 };
