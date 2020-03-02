@@ -30,6 +30,7 @@ cameraControl cameraControl::cameraControl() {
     theSourceVideo = VideoCapture(0, CAP_V4L2);
     theSourceVideo.set(CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_X);
     theSourceVideo.set(CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_Y);
+    theSourceVideo.set(CV_CAP_PROP_FPS, 15);
 
     if(!theSourceVideo.isOpened()) {
         std::cout << "Ok. Something went wrong. The camera didn't open right." << std::endl;
