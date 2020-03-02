@@ -9,6 +9,11 @@ class cameraControl {
 public:
     cameraControl();
     bool isDone();      //returns if the camera portion is done or not
+
+    double getInitialXVelocity();
+    double getInitialYVelocity();
+    double getInitialZVelocity();
+
 private:
     bool trackingStatus;        //false means it is done tracking
 };

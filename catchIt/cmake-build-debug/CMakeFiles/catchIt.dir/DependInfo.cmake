@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/drew/Documents/Drew/Drone/catchIt/main.cpp" "/home/drew/Documents/Drew/Drone/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir/main.cpp.o"
+  "/home/li292/CLionProjects/DroneCatch/catchIt/main.cpp" "/home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
