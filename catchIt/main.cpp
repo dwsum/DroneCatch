@@ -44,6 +44,7 @@ int main(int argc, char **argv)
     std::string connection_url;
     ConnectionResult connection_result;
     bool doneTracking = false;      //used for the while loop. Set to false at the start. When it is done tracking the ball, it will set to true
+    cameraControl ourCamera;
 
     bool discovered_system = false;
     if (argc == 2) {
@@ -133,9 +134,12 @@ int main(int argc, char **argv)
 
     std::cout << "Ready to track the ball" << std::endl;
 
-    doneTracking = true;
+    doneTracking = false;
     while(!doneTracking) {
 
+        if(ourCamera.isDone()) {
+            doneTracking = true;
+        }
     }
 
 
