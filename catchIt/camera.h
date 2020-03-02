@@ -18,6 +18,8 @@ cameraControl cameraControl::cameraControl() {
 }
 
 bool cameraControl::isDone() {
+    std::cout << "test" << std::endl;
+
     return trackingStatus;
 }
 
