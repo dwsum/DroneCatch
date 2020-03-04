@@ -8,6 +8,8 @@
 #define VIDEO_RESOLUTION_X 640
 #define VIDEO_RESOLUTION_Y 480
 
+#include <opencv2/opencv.hpp>
+
 class cameraControl {
 public:
     cameraControl();        //sets up everything when defined.
@@ -18,18 +20,18 @@ public:
 
 private:
     bool trackingStatus;        //false means it is done tracking
-    Vec2i videoResolution;
-    VideoCapture theSourceVideo;        //change it in the cameraControl() function if want something besides the camera.
+    cv::Vec2i videoResolution;
+    cv::VideoCapture theSourceVideo;        //change it in the cameraControl() function if want something besides the camera.
 };
 
-cameraControl cameraControl::cameraControl() {
+cameraControl::cameraControl() {
     trackingStatus = false;     //then when it checks it knows it isn't done.
 
     videoResolution = {VIDEO_RESOLUTION_X, VIDEO_RESOLUTION_Y};       //any more intense will make the pie too slow.
 
-    theSourceVideo = VideoCapture(0, CAP_V4L2);
-    theSourceVideo.set(CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_X);
-    theSourceVideo.set(CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_Y);
+//    theSourceVideo = cv::VideoCapture(0, cv::CAP_V4L2);
+    theSourceVideo.set(cv::CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_X);
+    theSourceVideo.set(cv::CAP_PROP_FRAME_WIDTH, VIDEO_RESOLUTION_Y);
     theSourceVideo.set(CV_CAP_PROP_FPS, 15);
 
     if(!theSourceVideo.isOpened()) {
