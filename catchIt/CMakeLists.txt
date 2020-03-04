@@ -15,7 +15,7 @@ include_directories(include)
 add_definitions("-std=c++11")
 
 # Enable strict handling of warnings
-add_definitions("-Wall -Wextra -Werror")
+add_definitions("-Wall -Wextra")
 
 # In case /usr/local/include is not in your default includes
 #include_directories(/usr/local/include)

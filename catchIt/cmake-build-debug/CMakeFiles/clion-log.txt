@@ -1,4 +1,4 @@
-/snap/clion/103/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/li292/CLionProjects/revisedDroneCatch/catchIt
+/snap/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/drew/Documents/Drew/Drone/DroneCatch/catchIt
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug
+-- Build files have been written to: /home/drew/Documents/Drew/Drone/DroneCatch/catchIt/cmake-build-debug
