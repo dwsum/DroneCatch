@@ -4,12 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/li292/CLionProjects/DroneCatch/catchIt/main.cpp" "/home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir/main.cpp.o"
+  "/home/li292/CLionProjects/revisedDroneCatch/catchIt/main.cpp" "/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "/usr/local/include/opencv4"
+  "../include"
   )
 
 # Targets to which this target links.

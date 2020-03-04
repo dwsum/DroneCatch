@@ -48,24 +48,13 @@ RM = /snap/clion/103/bin/cmake/linux/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/li292/CLionProjects/DroneCatch/catchIt
+CMAKE_SOURCE_DIR = /home/li292/CLionProjects/revisedDroneCatch/catchIt
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug
+CMAKE_BINARY_DIR = /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
-
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/snap/clion/103/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -78,11 +67,22 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/snap/clion/103/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles /home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -123,6 +123,19 @@ catchIt/fast:
 	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/build
 .PHONY : catchIt/fast
 
+#=============================================================================
+# Target rules for targets named catchItExecutable
+
+# Build rule for target.
+catchItExecutable: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 catchItExecutable
+.PHONY : catchItExecutable
+
+# fast build rule for target.
+catchItExecutable/fast:
+	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/build
+.PHONY : catchItExecutable/fast
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -130,6 +143,7 @@ main.o: main.cpp.o
 # target to build an object file
 main.cpp.o:
 	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -139,6 +153,7 @@ main.i: main.cpp.i
 # target to preprocess a source file
 main.cpp.i:
 	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -148,6 +163,7 @@ main.s: main.cpp.s
 # target to generate assembly for a file
 main.cpp.s:
 	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -156,9 +172,10 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... catchIt"
 	@echo "... edit_cache"
+	@echo "... catchIt"
+	@echo "... rebuild_cache"
+	@echo "... catchItExecutable"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

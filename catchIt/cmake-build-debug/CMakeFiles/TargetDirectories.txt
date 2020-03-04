@@ -1,3 +1,4 @@
-/home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir
-/home/li292/CLionProjects/DroneCatch/catchIt/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchIt.dir
+/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles/catchItExecutable.dir
