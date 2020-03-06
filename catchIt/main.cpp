@@ -2,15 +2,15 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc.hpp>
+//#include "test2.avi"
 
 using namespace std;
 using namespace cv;
 
-VideoCapture cap(-1);
-//VideoCapture cap('test2.avi');
+//VideoCapture cap(-1);
+VideoCapture cap("/home/drew/Downloads/test2.avi");
 
 void setUpCamera() {
-
 
     if(!cap.isOpened()) {
         cout << "Error opening video stream or file";
@@ -48,7 +48,7 @@ void convertToGrayScale() {
         }
 
         cv::cvtColor(frame, grayscale, CV_RGB2GRAY);        //convert to grayscale image
-        cv::threshold(grayscale, grayThreshold, 200, 255, CV_THRESH_BINARY_INV);
+        cv::threshold(grayscale, grayThreshold, 175, 255, CV_THRESH_BINARY_INV);
 
         imshow("Frame", frame);
         imshow("MyVideo", grayscale);
