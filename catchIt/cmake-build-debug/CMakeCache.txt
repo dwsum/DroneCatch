@@ -150,7 +150,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=catchIt
+CMAKE_PROJECT_NAME:STATIC=catchit
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -237,6 +237,12 @@ catch_BINARY_DIR:STATIC=/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmak
 
 //Value Computed by CMake
 catch_SOURCE_DIR:STATIC=/home/li292/CLionProjects/revisedDroneCatch/catchIt
+
+//Value Computed by CMake
+catchit_BINARY_DIR:STATIC=/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug
+
+//Value Computed by CMake
+catchit_SOURCE_DIR:STATIC=/home/li292/CLionProjects/revisedDroneCatch/catchIt
 
 
 ########################

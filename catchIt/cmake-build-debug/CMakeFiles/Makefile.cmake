@@ -17,7 +17,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeCommonLanguageInclude.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeExtraGeneratorDetermineCompilerMacrosAndIncludeDirs.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeFindCodeBlocks.cmake"
-  "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeFindDependencyMacro.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeGenericSystem.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeInitializeConfigs.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/CMakeLanguageInformation.cmake"
@@ -36,9 +35,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/Platform/Linux.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/Platform/UnixPaths.cmake"
   "/snap/clion/103/bin/cmake/linux/share/cmake-3.15/Modules/ProcessorCount.cmake"
-  "/usr/local/lib/cmake/MAVSDK/MAVSDKConfig.cmake"
-  "/usr/local/lib/cmake/MAVSDK/MAVSDKTargets-release.cmake"
-  "/usr/local/lib/cmake/MAVSDK/MAVSDKTargets.cmake"
   "/usr/local/lib/cmake/opencv4/OpenCVConfig-version.cmake"
   "/usr/local/lib/cmake/opencv4/OpenCVConfig.cmake"
   "/usr/local/lib/cmake/opencv4/OpenCVModules-release.cmake"
@@ -58,6 +54,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/catchIt.dir/DependInfo.cmake"
-  "CMakeFiles/catchItExecutable.dir/DependInfo.cmake"
+  "CMakeFiles/catchit.dir/DependInfo.cmake"
   )

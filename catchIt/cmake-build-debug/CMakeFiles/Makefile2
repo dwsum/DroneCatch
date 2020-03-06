@@ -53,14 +53,12 @@ CMAKE_BINARY_DIR = /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-bui
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/catchIt.dir/all
-all: CMakeFiles/catchItExecutable.dir/all
+all: CMakeFiles/catchit.dir/all
 
 .PHONY : all
 
 # The main recursive "clean" target.
-clean: CMakeFiles/catchIt.dir/clean
-clean: CMakeFiles/catchItExecutable.dir/clean
+clean: CMakeFiles/catchit.dir/clean
 
 .PHONY : clean
 
@@ -70,58 +68,31 @@ preinstall:
 .PHONY : preinstall
 
 #=============================================================================
-# Target rules for target CMakeFiles/catchIt.dir
+# Target rules for target CMakeFiles/catchit.dir
 
 # All Build rule for target.
-CMakeFiles/catchIt.dir/all:
-	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/depend
-	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target catchIt"
-.PHONY : CMakeFiles/catchIt.dir/all
+CMakeFiles/catchit.dir/all:
+	$(MAKE) -f CMakeFiles/catchit.dir/build.make CMakeFiles/catchit.dir/depend
+	$(MAKE) -f CMakeFiles/catchit.dir/build.make CMakeFiles/catchit.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target catchit"
+.PHONY : CMakeFiles/catchit.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/catchIt.dir/rule: cmake_check_build_system
+CMakeFiles/catchit.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/catchIt.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/catchit.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/catchIt.dir/rule
+.PHONY : CMakeFiles/catchit.dir/rule
 
 # Convenience name for target.
-catchIt: CMakeFiles/catchIt.dir/rule
+catchit: CMakeFiles/catchit.dir/rule
 
-.PHONY : catchIt
-
-# clean rule for target.
-CMakeFiles/catchIt.dir/clean:
-	$(MAKE) -f CMakeFiles/catchIt.dir/build.make CMakeFiles/catchIt.dir/clean
-.PHONY : CMakeFiles/catchIt.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/catchItExecutable.dir
-
-# All Build rule for target.
-CMakeFiles/catchItExecutable.dir/all:
-	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/depend
-	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target catchItExecutable"
-.PHONY : CMakeFiles/catchItExecutable.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/catchItExecutable.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/catchItExecutable.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/li292/CLionProjects/revisedDroneCatch/catchIt/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/catchItExecutable.dir/rule
-
-# Convenience name for target.
-catchItExecutable: CMakeFiles/catchItExecutable.dir/rule
-
-.PHONY : catchItExecutable
+.PHONY : catchit
 
 # clean rule for target.
-CMakeFiles/catchItExecutable.dir/clean:
-	$(MAKE) -f CMakeFiles/catchItExecutable.dir/build.make CMakeFiles/catchItExecutable.dir/clean
-.PHONY : CMakeFiles/catchItExecutable.dir/clean
+CMakeFiles/catchit.dir/clean:
+	$(MAKE) -f CMakeFiles/catchit.dir/build.make CMakeFiles/catchit.dir/clean
+.PHONY : CMakeFiles/catchit.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
