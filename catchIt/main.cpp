@@ -6,7 +6,8 @@
 using namespace std;
 using namespace cv;
 
-VideoCapture cap(0);
+VideoCapture cap(-1);
+//VideoCapture cap('test2.avi');
 
 void setUpCamera() {
 
@@ -67,7 +68,7 @@ void closeCamera() {
 
 int main() {
 
-//    setUpCamera();
+    setUpCamera();
 
     //displayCamera();
 
