@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 //VideoCapture cap(-1);
-VideoCapture cap("/home/drew/Downloads/test2.avi");
+VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 
 void setUpCamera() {
 
@@ -38,15 +38,16 @@ void convertToGrayScale() {
     bool firstTime = true;
     Mat oldFrame;
     Mat newFrame;
-//    Mat theContours;
     std::vector<Vec3f> theContours;
-//    vector<vector<Point2i>> theContours;
+    int cntr = 0;
+    std::vector<Vec3f> firstPoint;
+    std::vector<Vec3f> secondPoint;
 
     while(1) {
         Mat frame;
         Mat grayscale;
         Mat grayThreshold;
-        Mat differenceFrame;
+//        Mat differenceFrame;
 
         cap >> frame;
 
@@ -63,36 +64,37 @@ void convertToGrayScale() {
         }
         newFrame = grayThreshold;
 
-        cv::absdiff(oldFrame, newFrame, differenceFrame);
-//        cv::HoughCircles(differenceFrame, theContours, cv::HOUGH_GRADIENT_ALT, 1, 50000);
-//        cv::findContours(differenceFrame, theContours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-//
-//        std::cout << theContours.size() << " that is the size" << std::endl;
-//
+//        cv::absdiff(oldFrame, newFrame, differenceFrame);
 
+        HoughCircles(grayThreshold, theContours, HOUGH_GRADIENT, 1, grayThreshold.rows/64, 200, 10, 5, 30);
 
-//        HoughCircles(differenceFrame, theContours, HOUGH_GRADIENT, 1, differenceFrame.rows/64, 200, 10, 5, 30);
-//
-//        for(size_t i = 0; i < theContours.size(); i++) {
-//            Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
-//            int radius = cvRound(theContours[i][2]);
-//            circle(differenceFrame, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
-//        }
-
-        HoughCircles(differenceFrame, theContours, HOUGH_GRADIENT, 1, differenceFrame.rows/64, 200, 10, 5, 30);
+        if(theContours.size() != 0) {
+            cntr++;
+            if(cntr == 4) {
+                firstPoint = theContours;
+            }
+            else if(cntr == 5) {
+                secondPoint = theContours;
+            }
+            else if(cntr > 5) {
+                break;
+            }
+        }
 
         for(size_t i = 0; i < theContours.size(); i++) {
             Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
             int radius = cvRound(theContours[i][2]);
-            circle(differenceFrame, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
+            circle(grayThreshold, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
         }
 
         imshow("Frame", frame);
         imshow("MyVideo", grayscale);
         imshow("grayThreshold", grayThreshold);
-        imshow("difference One", differenceFrame);
+//        imshow("difference One", differenceFrame);
 
         oldFrame = newFrame;        //set it up for the next round!
+
+        theContours.clear();
 
         char c = (char)waitKey(25);
         if(c==27)
@@ -100,6 +102,16 @@ void convertToGrayScale() {
     }
 
     std::cout << theContours.size() << std::endl;
+
+    std::cout << "at the end the cntr is at " << cntr << std::endl;
+
+    Point centerOne(cvRound(firstPoint[0][0]), cvRound(firstPoint[0][1]));
+    int radiusOne = cvRound(firstPoint[0][2]);
+
+    Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
+    int radiusTwo = cvRound(secondPoint[0][2]);
+
+    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")" << std::endl;
 
 
 }
