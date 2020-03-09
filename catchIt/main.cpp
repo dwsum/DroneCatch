@@ -35,11 +35,15 @@ void displayCamera() {
 }
 
 void convertToGrayScale() {
+    bool firstTime = true;
+    Mat oldFrame;
+    Mat newFrame;
 
     while(1) {
         Mat frame;
         Mat grayscale;
         Mat grayThreshold;
+        Mat differenceFrame;
 
         cap >> frame;
 
@@ -48,11 +52,22 @@ void convertToGrayScale() {
         }
 
         cv::cvtColor(frame, grayscale, CV_RGB2GRAY);        //convert to grayscale image
-        cv::threshold(grayscale, grayThreshold, 175, 255, CV_THRESH_BINARY_INV);
+        cv::threshold(grayscale, grayThreshold, 100, 255, CV_THRESH_BINARY_INV);
+
+        if(firstTime) {
+            firstTime = false;
+            oldFrame = grayThreshold;
+        }
+        newFrame = grayThreshold;
+
+        cv::absdiff(oldFrame, newFrame, differenceFrame);
 
         imshow("Frame", frame);
         imshow("MyVideo", grayscale);
         imshow("grayThreshold", grayThreshold);
+        imshow("difference One", differenceFrame);
+
+        oldFrame = newFrame;        //set it up for the next round!
 
         char c = (char)waitKey(25);
         if(c==27)
