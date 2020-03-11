@@ -27,8 +27,8 @@ public:
         initialXVelocity = initialX;
         initialYVelocity = initialY;
         initialZVelocity = initialZ;
-        this.distanceToBall = distanceToBall;
-        this.droneHeight = droneHeight;
+        this->distanceToBall = distanceToBall;
+        this->droneHeight = droneHeight;
     }
 
     double getTime(double landingAltitude) {

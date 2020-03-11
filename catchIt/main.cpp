@@ -2,12 +2,13 @@
 #include "opencv2/opencv.hpp"
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc.hpp>
+#include "CalculatePosition.h"
 //#include "test2.avi"
 
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(-1);
+//VideoCapture cap(0);
 VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 
 void setUpCamera() {
@@ -87,9 +88,9 @@ void convertToGrayScale() {
             circle(grayThreshold, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
         }
 
-        imshow("Frame", frame);
-        imshow("MyVideo", grayscale);
-        imshow("grayThreshold", grayThreshold);
+//        imshow("Frame", frame);
+//        imshow("MyVideo", grayscale);
+//        imshow("grayThreshold", grayThreshold);
 //        imshow("difference One", differenceFrame);
 
         oldFrame = newFrame;        //set it up for the next round!
@@ -101,18 +102,31 @@ void convertToGrayScale() {
             break;
     }
 
-    std::cout << theContours.size() << std::endl;
-
-    std::cout << "at the end the cntr is at " << cntr << std::endl;
-
+    //make the center and radius
     Point centerOne(cvRound(firstPoint[0][0]), cvRound(firstPoint[0][1]));
     int radiusOne = cvRound(firstPoint[0][2]);
-
     Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
     int radiusTwo = cvRound(secondPoint[0][2]);
 
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")" << std::endl;
+    std::cout << "radius of the two" << radiusOne << " " << radiusTwo << std::endl;
 
+    double focalLength = 3.6;
+    double ballRealDiameter = 127;
+
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne));
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo));
+
+    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
+    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
+
+    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
+    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
+    double zVelocity = (distanceToBallTwo - distanceToBallOne) * 60;
+
+    std::cout << "the x velocity is " << xVelocity <<std::endl;
+    std::cout << "The y velocity is " << yVelocity << std::endl;
+    std::cout << "The Z velocity is " << zVelocity << std::endl;
 
 }
 
