@@ -50,7 +50,7 @@ void convertToGrayScale() {
     std::vector<Vec3f> secondPoint;
 
     while(1) {
-        auto start = chrono::high_resolution_clock::now();
+
         Mat frame;
         Mat grayscale;
         Mat grayThreshold;
@@ -62,8 +62,17 @@ void convertToGrayScale() {
             break;      //this would mean something went wrong
         }
 
+        auto start = chrono::high_resolution_clock::now();
         cv::cvtColor(frame, grayscale, CV_RGB2GRAY);        //convert to grayscale image
+        auto stop = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "this is duration of cvtColor: " << duration.count() << std::endl;
+
+        start = chrono::high_resolution_clock::now();
         cv::threshold(grayscale, grayThreshold, 100, 255, CV_THRESH_BINARY_INV);
+        stop = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "this is duration of threshold: " << duration.count() << std::endl;
 
 //        if(firstTime) {
 //            firstTime = false;
@@ -73,8 +82,13 @@ void convertToGrayScale() {
 
 //        cv::absdiff(oldFrame, newFrame, differenceFrame);
 
+        start = chrono::high_resolution_clock::now();
         HoughCircles(grayThreshold, theContours, HOUGH_GRADIENT, 1, grayThreshold.rows/64, 200, 10, 5, 30);
+        stop = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "this is duration of HoughCircles: " << duration.count() << std::endl;
 
+        start = chrono::high_resolution_clock::now();
         if(theContours.size() != 0) {
             cntr++;
             if(cntr == 4) {
@@ -87,6 +101,10 @@ void convertToGrayScale() {
                 break;
             }
         }
+        stop = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "this is duration of if statement: " << duration.count() << std::endl;
+
 
 //        for(size_t i = 0; i < theContours.size(); i++) {
 //            Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
@@ -101,15 +119,14 @@ void convertToGrayScale() {
 
 //        oldFrame = newFrame;        //set it up for the next round!
 
+        start = chrono::high_resolution_clock::now();
         theContours.clear();
-
+        stop = chrono::high_resolution_clock::now();
+        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << "this is duration of clearing: " << duration.count() << std::endl;
 //        char c = (char)waitKey(25);
 //        if(c==27)
 //            break;
-
-        auto stop = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << duration.count() << std::endl;
     }
 
     //make the center and radius
