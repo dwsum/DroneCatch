@@ -5,11 +5,16 @@
 #include "CalculatePosition.h"
 //#include "test2.avi"
 
+
+//these next few are for testing only. Remove later to save space/speed on pi
+#include <chrono>
+
+
 using namespace std;
 using namespace cv;
 
-VideoCapture cap(0);
-//VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+//VideoCapture cap(0);
+VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 
 void setUpCamera() {
 
@@ -45,6 +50,7 @@ void convertToGrayScale() {
     std::vector<Vec3f> secondPoint;
 
     while(1) {
+        auto start = chrono::high_resolution_clock::now();
         Mat frame;
         Mat grayscale;
         Mat grayThreshold;
@@ -59,11 +65,11 @@ void convertToGrayScale() {
         cv::cvtColor(frame, grayscale, CV_RGB2GRAY);        //convert to grayscale image
         cv::threshold(grayscale, grayThreshold, 100, 255, CV_THRESH_BINARY_INV);
 
-        if(firstTime) {
-            firstTime = false;
-            oldFrame = grayThreshold;
-        }
-        newFrame = grayThreshold;
+//        if(firstTime) {
+//            firstTime = false;
+//            oldFrame = grayThreshold;
+//        }
+//        newFrame = grayThreshold;
 
 //        cv::absdiff(oldFrame, newFrame, differenceFrame);
 
@@ -82,24 +88,28 @@ void convertToGrayScale() {
             }
         }
 
-        for(size_t i = 0; i < theContours.size(); i++) {
-            Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
-            int radius = cvRound(theContours[i][2]);
-            circle(grayThreshold, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
-        }
+//        for(size_t i = 0; i < theContours.size(); i++) {
+//            Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
+//            int radius = cvRound(theContours[i][2]);
+//            circle(grayThreshold, center, radius, Scalar(255, 255, 255), 2, 8 , 0);
+//        }
 
 //        imshow("Frame", frame);
 //        imshow("MyVideo", grayscale);
 //        imshow("grayThreshold", grayThreshold);
 //        imshow("difference One", differenceFrame);
 
-        oldFrame = newFrame;        //set it up for the next round!
+//        oldFrame = newFrame;        //set it up for the next round!
 
         theContours.clear();
 
-        char c = (char)waitKey(25);
-        if(c==27)
-            break;
+//        char c = (char)waitKey(25);
+//        if(c==27)
+//            break;
+
+        auto stop = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        std::cout << duration.count() << std::endl;
     }
 
     //make the center and radius
