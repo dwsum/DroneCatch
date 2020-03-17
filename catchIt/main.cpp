@@ -82,13 +82,13 @@ void convertToGrayScale() {
 
         if(theContours.size() != 0) {
             cntr++;
-            if(cntr == 4) {
+            if(cntr == 2) {
                 firstPoint = theContours;
             }
-            else if(cntr == 5) {
+            else if(cntr == 3) {
                 secondPoint = theContours;
             }
-            else if(cntr > 5) {
+            else if(cntr > 3) {
                 break;
             }
         }
