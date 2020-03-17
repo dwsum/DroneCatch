@@ -9,12 +9,16 @@
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
+#define CHOSEN_WINDOW 1500          //note in milliseconds. NOTE: This is milliseconds per frame
+#define FRAMES_PER_SECOND (1 / CHOSEN_WINDOW * 1000)        //note, this is the frames per second used in some caluclations
 
 using namespace std;
 using namespace cv;
 
 //VideoCapture cap(0);
 VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+//VideoCapture cap("/home/drew/Downloads/march17.h264");
+
 
 void setUpCamera() {
 
@@ -50,7 +54,7 @@ void convertToGrayScale() {
     std::vector<Vec3f> secondPoint;
 
     while(1) {
-
+        auto start = chrono::high_resolution_clock::now();
         Mat frame;
         Mat grayscale;
         Mat grayThreshold;
@@ -62,17 +66,9 @@ void convertToGrayScale() {
             break;      //this would mean something went wrong
         }
 
-        auto start = chrono::high_resolution_clock::now();
         cv::cvtColor(frame, grayscale, CV_RGB2GRAY);        //convert to grayscale image
-        auto stop = chrono::high_resolution_clock::now();
-        auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << "this is duration of cvtColor: " << duration.count() << std::endl;
 
-        start = chrono::high_resolution_clock::now();
         cv::threshold(grayscale, grayThreshold, 100, 255, CV_THRESH_BINARY_INV);
-        stop = chrono::high_resolution_clock::now();
-        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << "this is duration of threshold: " << duration.count() << std::endl;
 
 //        if(firstTime) {
 //            firstTime = false;
@@ -82,13 +78,8 @@ void convertToGrayScale() {
 
 //        cv::absdiff(oldFrame, newFrame, differenceFrame);
 
-        start = chrono::high_resolution_clock::now();
-        HoughCircles(grayThreshold, theContours, HOUGH_GRADIENT, 1, grayThreshold.rows/64, 200, 10, 5, 30);
-        stop = chrono::high_resolution_clock::now();
-        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << "this is duration of HoughCircles: " << duration.count() << std::endl;
+        HoughCircles(grayThreshold, theContours, HOUGH_GRADIENT, 1, grayThreshold.rows/64, 200, 10, 5, 15);
 
-        start = chrono::high_resolution_clock::now();
         if(theContours.size() != 0) {
             cntr++;
             if(cntr == 4) {
@@ -101,10 +92,6 @@ void convertToGrayScale() {
                 break;
             }
         }
-        stop = chrono::high_resolution_clock::now();
-        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << "this is duration of if statement: " << duration.count() << std::endl;
-
 
 //        for(size_t i = 0; i < theContours.size(); i++) {
 //            Point center(cvRound(theContours[i][0]), cvRound(theContours[i][1]));
@@ -119,14 +106,23 @@ void convertToGrayScale() {
 
 //        oldFrame = newFrame;        //set it up for the next round!
 
-        start = chrono::high_resolution_clock::now();
         theContours.clear();
-        stop = chrono::high_resolution_clock::now();
-        duration = chrono::duration_cast<chrono::microseconds>(stop - start);
-        std::cout << "this is duration of clearing: " << duration.count() << std::endl;
+
 //        char c = (char)waitKey(25);
 //        if(c==27)
 //            break;
+
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        std::cout << "the duration " << duration.count() << std::endl;
+        if(duration.count() > CHOSEN_WINDOW) {
+            std::cout << "the chosen window is too small. The duration here is " << duration.count() << std::endl;
+        }
+        while (duration.count() < CHOSEN_WINDOW) {
+            end = chrono::high_resolution_clock::now();
+            duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        }
+        std::cout << "the duration after is " << duration.count() << std::endl;
     }
 
     //make the center and radius
@@ -147,8 +143,8 @@ void convertToGrayScale() {
     std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
 
-    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
-    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
+    double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
+    double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
     double zVelocity = (distanceToBallTwo - distanceToBallOne) * 60;
 
     std::cout << "the x velocity is " << xVelocity <<std::endl;
