@@ -12,11 +12,11 @@
 class CalculatePosition {
 
 private:
-    double initialXVelocity;
-    double initialYVelocity;
-    double initialZVelocity;
-    double distanceToBall;
-    double droneHeight;
+    double initialXVelocity;        //want in meters/second--should be constant!
+    double initialYVelocity;        //want in meters/second--should be constant! to small for air resistance
+    double initialZVelocity;        //want in meters/second
+    double distanceToBall;          //in meters
+    double droneHeight;             //height drone is at?
 
 public:
     CalculatePosition() {

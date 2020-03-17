@@ -8,8 +8,8 @@
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(0);
-VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+VideoCapture cap(0);
+//VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 
 void setUpCamera() {
 
@@ -108,14 +108,14 @@ void convertToGrayScale() {
     Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
     int radiusTwo = cvRound(secondPoint[0][2]);
 
-    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")" << std::endl;
-    std::cout << "radius of the two" << radiusOne << " " << radiusTwo << std::endl;
+    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
+    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 
-    double focalLength = 3.6;
-    double ballRealDiameter = 127;
+    double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double ballRealDiameter = 127;       //this is in milimeters
 
-    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne));
-    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo));
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne));       //Meters?
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo));      //Meters?
 
     std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
@@ -127,6 +127,16 @@ void convertToGrayScale() {
     std::cout << "the x velocity is " << xVelocity <<std::endl;
     std::cout << "The y velocity is " << yVelocity << std::endl;
     std::cout << "The Z velocity is " << zVelocity << std::endl;
+
+    double catchAltitude = 2;
+
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, distanceToBallTwo, catchAltitude);
+    double timeToFall = dronePosition.getTime(catchAltitude);
+    double xFinal = dronePosition.getFinalX(timeToFall);
+    double yFinal = dronePosition.getFinalY(timeToFall);
+
+    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+    std::cout << "The time caluclated is " << timeToFall << std::endl;
 
 }
 
