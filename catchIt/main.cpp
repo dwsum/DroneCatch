@@ -9,14 +9,14 @@
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
-#define CHOSEN_WINDOW 60          //note in milliseconds. NOTE: This is milliseconds per frame
+#define CHOSEN_WINDOW 350          //note in milliseconds. NOTE: This is milliseconds per frame
 #define FRAMES_PER_SECOND 60//(1 / CHOSEN_WINDOW * 1000)        //note, this is the frames per second used in some caluclations
 
 using namespace std;
 using namespace cv;
 
-VideoCapture cap(0);
-//VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+//VideoCapture cap(0);
+VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -65,6 +65,7 @@ void findContours() {
         auto start = chrono::high_resolution_clock::now();
         Mat image;
         cap >> image;
+        bool allDone = false;
 
         if(image.empty()) {
             std::cout << "breaks" << std::endl;
@@ -89,14 +90,15 @@ void findContours() {
 //
 //            sort(contours.begin(), contours.end(), compareContourAreas);
 
-            std::vector<cv::Point_<int>> ballContour = contours[contours.size() - 1];
+            for(int i = 0; i < contours.size(); i++) {
+                std::vector<cv::Point_<int>> ballContour = contours[i];
 
-            Point2f foundCenter;
-            float foundRadius;
-            minEnclosingCircle(ballContour, foundCenter, foundRadius);
-            if(foundRadius > 5 && foundRadius < 20) {
-//                std::cout << "found a contour " << contours.size() << std::endl;
-//                std::cout << "radius of " << foundRadius << std::endl;
+                Point2f foundCenter;
+                float foundRadius;
+                minEnclosingCircle(ballContour, foundCenter, foundRadius);
+                if(foundRadius > 5 && foundRadius < 20) {
+//                    std::cout << "found a contour " << contours.size() << std::endl;
+//                    std::cout << "radius of " << foundRadius << std::endl;
 //                for( int i = 0; i< contours.size(); i++ )
 //                {
 //                    Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
@@ -105,23 +107,37 @@ void findContours() {
 //                }
 //
 //                imshow( "Result window", drawing );
-                cntrBall++;
-                if(cntrBall == 5) {
-                    centerOne = foundCenter;
-                    radiusOne = foundRadius;
-                }
-                else if(cntrBall == 6) {
-                    centerTwo = foundCenter;
-                    radiusTwo = foundRadius;
-                }
-                else if(cntrBall > 6) {
-                    break;
+                    if(cntrBall < 5) {
+                        cntrBall++;
+                        break;
+                    }
+                    else if(cntrBall == 5) {
+                        cntrBall++;
+                        centerOne = foundCenter;
+                        radiusOne = foundRadius;
+                        break;
+                    }
+                    else if(cntrBall == 6) {
+                        cntrBall++;
+                        centerTwo = foundCenter;
+                        radiusTwo = foundRadius;
+                        break;
+                    }
+                    else if(cntrBall > 6) {
+                        allDone = true;
+                        break;
+                    }
                 }
             }
 
 
+
         }
 
+        if(allDone) {
+            std::cout << "breaks the right way" << std::endl;
+            break;
+        }
 
         char c = (char)waitKey(25);
         if(c==27)
@@ -146,6 +162,7 @@ void findContours() {
 //    int radiusTwo = cvRound(secondPoint[0][2]);
 
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
+    std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
     std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 
     double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
@@ -169,9 +186,9 @@ void findContours() {
     double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
     double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
 
-    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
-    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
-    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * 60;
+    double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
+    double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
+    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
 
     std::cout << "the x velocity is " << xVelocity <<std::endl;
     std::cout << "The y velocity is " << yVelocity << std::endl;
