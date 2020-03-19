@@ -9,14 +9,14 @@
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
-#define CHOSEN_WINDOW 350          //note in milliseconds. NOTE: This is milliseconds per frame
+#define CHOSEN_WINDOW 60 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
 #define FRAMES_PER_SECOND 60//(1 / CHOSEN_WINDOW * 1000)        //note, this is the frames per second used in some caluclations
 
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(0);
-VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+VideoCapture cap(0);
+//VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -156,11 +156,6 @@ void findContours() {
         std::cout << "the duration after is " << duration.count() << std::endl;
     }
 
-//    Point centerOne(cvRound(firstPoint.), cvRound(firstPoint[0][1]));
-//    int radiusOne = cvRound(firstPoint[0][2]);
-//    Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
-//    int radiusTwo = cvRound(secondPoint[0][2]);
-
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
     std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
     std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
@@ -175,13 +170,13 @@ void findContours() {
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
 
     //calculate the z heights
-    double distanceXaxisBallOne = abs(320 - centerOne.x);
-    double distanceYaxisBallOne = abs(240- centerOne.y);
-    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2)) * focalLength / 1000;
+    double distanceXaxisBallOne = (centerOne.x - 320) * focalLength / 1000;
+    double distanceYaxisBallOne = (centerOne.y - 240) * focalLength / 1000;
+    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
 
-    double distanceXaxisBallTwo = abs(320 - centerTwo.x);
-    double distanceYaxisBallTwo = abs(240- centerTwo.y);
-    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2)) * focalLength / 1000;
+    double distanceXaxisBallTwo = (centerTwo.x - 320) * focalLength / 1000;
+    double distanceYaxisBallTwo = (centerTwo.y - 240) * focalLength / 1000;
+    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
 
     double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
     double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
@@ -196,7 +191,7 @@ void findContours() {
 
     double catchAltitude = 2;
 
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
     double timeToFall = dronePosition.getTime(catchAltitude);
     double xFinal = dronePosition.getFinalX(timeToFall);
     double yFinal = dronePosition.getFinalY(timeToFall);
@@ -340,13 +335,13 @@ void convertToGrayScale() {
 
     double catchAltitude = 2;
 
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
-    double timeToFall = dronePosition.getTime(catchAltitude);
-    double xFinal = dronePosition.getFinalX(timeToFall);
-    double yFinal = dronePosition.getFinalY(timeToFall);
+    //CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
+//    double timeToFall = dronePosition.getTime(catchAltitude);
+//    double xFinal = dronePosition.getFinalX(timeToFall);
+//    double yFinal = dronePosition.getFinalY(timeToFall);
 
-    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
-    std::cout << "The time caluclated is " << timeToFall << std::endl;
+//    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+//    std::cout << "The time caluclated is " << timeToFall << std::endl;
 
 }
 
