@@ -44,6 +44,139 @@ void displayCamera() {
     }
 }
 
+//this function is called when sorting the Contours...we only want the one that is the ball. and it will be the biggest.
+bool compareContourAreas(const std::vector<Point2i>& contourOne, const vector<Point2i>& contourTwo) {
+    double i = contourArea(contourOne, false);      //note, false is because we don't care about orientation
+    double j = contourArea(contourTwo, false);
+
+    return (i < j);
+}
+
+void findContours() {
+    int cntrBall = 0;
+    std::vector<cv::Point_<int>> firstPoint;
+    std::vector<cv::Point_<int>> secondPoint;
+    Point2f centerOne;
+    float radiusOne;
+    Point2f centerTwo;
+    float radiusTwo;
+
+    while(1) {
+        Mat image;
+        cap >> image;
+
+        if(image.empty()) {
+            std::cout << "breaks" << std::endl;
+            break;
+        }
+
+//        namedWindow( "Display window", CV_WINDOW_AUTOSIZE );
+//        imshow( "Display window", image );
+
+        Mat gray;
+        cvtColor(image, gray, CV_BGR2GRAY);
+        Canny(gray, gray, 100, 200, 3);
+
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        RNG rng(12345);
+        findContours( gray, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+        if(contours.size() > 1) {
+            /// Draw contours
+            Mat drawing = Mat::zeros( gray.size(), CV_8UC3 );
+
+            sort(contours.begin(), contours.end(), compareContourAreas);
+
+            std::vector<cv::Point_<int>> ballContour = contours[contours.size() - 1];
+
+            Point2f foundCenter;
+            float foundRadius;
+            minEnclosingCircle(ballContour, foundCenter, foundRadius);
+            if(foundRadius > 5 && foundRadius < 20) {
+//                std::cout << "found a contour " << contours.size() << std::endl;
+//                std::cout << "radius of " << foundRadius << std::endl;
+//                for( int i = 0; i< contours.size(); i++ )
+//                {
+//                    Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+//                    drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+//
+//                }
+//
+//                imshow( "Result window", drawing );
+                cntrBall++;
+                if(cntrBall == 5) {
+                    centerOne = foundCenter;
+                    radiusOne = foundRadius;
+                }
+                else if(cntrBall == 6) {
+                    centerTwo = foundCenter;
+                    radiusTwo = foundRadius;
+                }
+                else if(cntrBall > 6) {
+                    break;
+                }
+            }
+
+
+        }
+
+
+        char c = (char)waitKey(25);
+        if(c==27)
+            break;
+    }
+
+//    Point centerOne(cvRound(firstPoint.), cvRound(firstPoint[0][1]));
+//    int radiusOne = cvRound(firstPoint[0][2]);
+//    Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
+//    int radiusTwo = cvRound(secondPoint[0][2]);
+
+    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
+    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
+
+    double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double ballRealDiameter = 127;       //this is in milimeters
+
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
+
+    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
+    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
+
+    //calculate the z heights
+    double distanceXaxisBallOne = abs(320 - centerOne.x);
+    double distanceYaxisBallOne = abs(240- centerOne.y);
+    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2)) * focalLength / 1000;
+
+    double distanceXaxisBallTwo = abs(320 - centerTwo.x);
+    double distanceYaxisBallTwo = abs(240- centerTwo.y);
+    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2)) * focalLength / 1000;
+
+    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
+    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
+
+    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
+    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
+    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * 60;
+
+    std::cout << "the x velocity is " << xVelocity <<std::endl;
+    std::cout << "The y velocity is " << yVelocity << std::endl;
+    std::cout << "The Z velocity is " << zVelocity << std::endl;
+
+    double catchAltitude = 2;
+
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
+    double timeToFall = dronePosition.getTime(catchAltitude);
+    double xFinal = dronePosition.getFinalX(timeToFall);
+    double yFinal = dronePosition.getFinalY(timeToFall);
+
+    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+    std::cout << "The time caluclated is " << timeToFall << std::endl;
+
+}
+
+
 void convertToGrayScale() {
     bool firstTime = true;
     Mat oldFrame;
@@ -169,7 +302,7 @@ void convertToGrayScale() {
 
     double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
     double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
-    double zVelocity = (zHeightBallTwo - zHeightBallOne) * 60;
+    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * 60;
 
     std::cout << "the x velocity is " << xVelocity <<std::endl;
     std::cout << "The y velocity is " << yVelocity << std::endl;
@@ -177,7 +310,7 @@ void convertToGrayScale() {
 
     double catchAltitude = 2;
 
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, distanceToBallTwo, catchAltitude);
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
     double timeToFall = dronePosition.getTime(catchAltitude);
     double xFinal = dronePosition.getFinalX(timeToFall);
     double yFinal = dronePosition.getFinalY(timeToFall);
@@ -197,9 +330,11 @@ int main() {
 
     setUpCamera();
 
-    //displayCamera();
+//    displayCamera();
 
-    convertToGrayScale();
+    //convertToGrayScale();
+
+    findContours();
 
     closeCamera();
     return 0;
