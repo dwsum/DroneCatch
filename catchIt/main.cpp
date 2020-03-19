@@ -15,8 +15,8 @@
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(0);
-VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
+VideoCapture cap(0);
+//VideoCapture cap("/home/drew/Downloads/v4-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -62,6 +62,7 @@ void findContours() {
     float radiusTwo;
 
     while(1) {
+        auto start = chrono::high_resolution_clock::now();
         Mat image;
         cap >> image;
 
@@ -83,10 +84,10 @@ void findContours() {
         findContours( gray, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
         if(contours.size() > 1) {
-            /// Draw contours
-            Mat drawing = Mat::zeros( gray.size(), CV_8UC3 );
-
-            sort(contours.begin(), contours.end(), compareContourAreas);
+//            /// Draw contours
+//            Mat drawing = Mat::zeros( gray.size(), CV_8UC3 );
+//
+//            sort(contours.begin(), contours.end(), compareContourAreas);
 
             std::vector<cv::Point_<int>> ballContour = contours[contours.size() - 1];
 
@@ -125,6 +126,18 @@ void findContours() {
         char c = (char)waitKey(25);
         if(c==27)
             break;
+
+        auto end = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        std::cout << "the duration " << duration.count() << std::endl;
+        if(duration.count() > CHOSEN_WINDOW) {
+            std::cout << "the chosen window is too small. The duration here is " << duration.count() << std::endl;
+        }
+        while (duration.count() < CHOSEN_WINDOW) {
+            end = chrono::high_resolution_clock::now();
+            duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+        }
+        std::cout << "the duration after is " << duration.count() << std::endl;
     }
 
 //    Point centerOne(cvRound(firstPoint.), cvRound(firstPoint[0][1]));
