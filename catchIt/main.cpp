@@ -15,8 +15,8 @@
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(0);
-VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
+VideoCapture cap(0);
+//VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -178,11 +178,19 @@ void findContours() {
 //    radiusOne = 14.9165;
 //    radiusTwo = 8.86012;
 
+    //test four
+//    centerOne.x = 852.5;
+//    centerOne.y = 263.5;
+//    centerTwo.x = 1027.41;
+//    centerTwo.y = 629.319;
+//    radiusOne = 13.5832;
+//    radiusTwo = 10.6686;
+
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
     std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
     std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 
-    double focalLength = 3.04;            //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double focalLength = 3.04;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
     double ballRealDiameter = 127;       //this is in milimeters
 
     double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
@@ -200,11 +208,11 @@ void findContours() {
     double distanceYaxisBallTwo = (centerTwo.y - 972) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
     double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
 
-//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
-//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
+    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
+    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
 
-    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
-    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
+//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
+//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
 
 
     std::cout << FRAMES_PER_SECOND << std::endl;
