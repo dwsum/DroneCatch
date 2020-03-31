@@ -10,7 +10,7 @@
 #include <chrono>
 
 #define CHOSEN_WINDOW 350 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
-#define FRAMES_PER_SECOND 60//(1 / CHOSEN_WINDOW * 1000)        //note, this is the frames per second used in some caluclations
+#define FRAMES_PER_SECOND ((1.0 / CHOSEN_WINDOW) * 1000)        //note, this is the frames per second used in some caluclations
 
 using namespace std;
 using namespace cv;
@@ -154,11 +154,35 @@ void findContours() {
         std::cout << "the duration after is " << duration.count() << std::endl;
     }
 
+    //test One
+//    centerOne.x = 971.447;
+//    centerOne.y = 7.13158;
+//    centerTwo.x = 973;
+//    centerTwo.y = 855;
+//    radiusOne = 8.07907;
+//    radiusTwo = 6.7083;
+
+    //testTwo
+//    centerOne.x = 1317;
+//    centerOne.y = 9;
+//    centerTwo.x = 1589.5;
+//    centerTwo.y = 1497;
+//    radiusOne = 5.0001;
+//    radiusTwo = 5.31517;
+
+    //testThree
+//    centerOne.x = 2546.5;
+//    centerOne.y = 14.5;
+//    centerTwo.x = 2545.5;
+//    centerTwo.y = 8.5;
+//    radiusOne = 14.9165;
+//    radiusTwo = 8.86012;
+
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
     std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
     std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 
-    double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double focalLength = 3.04;            //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
     double ballRealDiameter = 127;       //this is in milimeters
 
     double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
@@ -168,17 +192,22 @@ void findContours() {
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
 
     //calculate the z heights
-    double distanceXaxisBallOne = (centerOne.x - 320) * focalLength / 1000;
-    double distanceYaxisBallOne = (centerOne.y - 240) * focalLength / 1000;
+    double distanceXaxisBallOne = (centerOne.x - 1296) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallOne = (centerOne.y - 972) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
     double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
 
-    double distanceXaxisBallTwo = (centerTwo.x - 320) * focalLength / 1000;
-    double distanceYaxisBallTwo = (centerTwo.y - 240) * focalLength / 1000;
+    double distanceXaxisBallTwo = (centerTwo.x - 1296) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallTwo = (centerTwo.y - 972) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
     double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
 
-    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
-    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
+//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
+//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
 
+    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
+    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
+
+
+    std::cout << FRAMES_PER_SECOND << std::endl;
     double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
     double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
     double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
@@ -186,8 +215,15 @@ void findContours() {
     std::cout << "the x velocity is " << xVelocity <<std::endl;
     std::cout << "The y velocity is " << yVelocity << std::endl;
     std::cout << "The Z velocity is " << zVelocity << std::endl;
+    std::cout << "the x axis ball one " << distanceXaxisBallOne << std::endl;
+    std::cout << "the x axis ball two " << distanceXaxisBallTwo << std::endl;
+    std::cout << "the y axis ball one " << distanceYaxisBallOne << std::endl;
+    std::cout << "the y axis ball two " << distanceYaxisBallTwo << std::endl;
+    std::cout << "the z height ball one " << zHeightBallOne << std::endl;
+    std::cout << "the z height ball two " << zHeightBallTwo << std::endl;
+    std::cout << "focal length " << focalLength << std::endl;
 
-    double catchAltitude = 2;
+    double catchAltitude = 0;
 
     CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
     double timeToFall = dronePosition.getTime(catchAltitude);

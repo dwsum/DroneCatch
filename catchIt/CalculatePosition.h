@@ -58,7 +58,7 @@ public:
         //we need some initial condition in here. I think this is assuming that it moves from the position of the drone
         std::cout << "NOTE:: initial xPosition " << initialXPosition << std::endl;
         return (initialXPosition + initialXVelocity * time);
-        //return (initialXVelocity * time);
+//        return (initialXVelocity * time);
     }
 
     double getFinalY(double time) {
