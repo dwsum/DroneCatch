@@ -9,14 +9,14 @@
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
-#define CHOSEN_WINDOW 60 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
+#define CHOSEN_WINDOW 350 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
 #define FRAMES_PER_SECOND 60//(1 / CHOSEN_WINDOW * 1000)        //note, this is the frames per second used in some caluclations
 
 using namespace std;
 using namespace cv;
 
-VideoCapture cap(0);
-//VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
+//VideoCapture cap(0);
+VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -107,23 +107,21 @@ void findContours() {
 //                }
 //
 //                imshow( "Result window", drawing );
-                    if(cntrBall < 5) {
-                        cntrBall++;
-                        break;
-                    }
-                    else if(cntrBall == 5) {
+
+                    if(cntrBall == 0) {
                         cntrBall++;
                         centerOne = foundCenter;
                         radiusOne = foundRadius;
                         break;
                     }
-                    else if(cntrBall == 6) {
+                    else if(cntrBall == 1) {
                         cntrBall++;
                         centerTwo = foundCenter;
                         radiusTwo = foundRadius;
+                        allDone = true;
                         break;
                     }
-                    else if(cntrBall > 6) {
+                    else if(cntrBall > 1) {
                         allDone = true;
                         break;
                     }
