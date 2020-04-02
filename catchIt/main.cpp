@@ -5,11 +5,10 @@
 #include "CalculatePosition.h"
 //#include "test2.avi"
 
-
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
-#define CHOSEN_WINDOW 60 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
+#define CHOSEN_WINDOW 75 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
 #define FRAMES_PER_SECOND ((1.0 / CHOSEN_WINDOW) * 1000)        //note, this is the frames per second used in some caluclations
 
 #define VIDEO_WIDTH 640
@@ -26,10 +25,143 @@ VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
 void setUpCamera() {
 
     if(!cap.isOpened()) {
-        cout << "Error opening video stream or file";
+        std::cout << "Error opening video stream or file" << std::endl;
     }
-    cap.set(CV_CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH);
-    cap.set(CV_CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT);
+    cap.set(CAP_PROP_FRAME_WIDTH, VIDEO_WIDTH);
+    cap.set(CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT);
+}
+
+void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, float radiusTwo) {
+    //test One
+//    centerOne.x = 971.447;
+//    centerOne.y = 7.13158;
+//    centerTwo.x = 973;
+//    centerTwo.y = 855;
+//    radiusOne = 8.07907;
+//    radiusTwo = 6.7083;
+
+    //testTwo
+//    centerOne.x = 1317;
+//    centerOne.y = 9;
+//    centerTwo.x = 1589.5;
+//    centerTwo.y = 1497;
+//    radiusOne = 5.0001;
+//    radiusTwo = 5.31517;
+
+    //testThree
+//    centerOne.x = 2546.5;
+//    centerOne.y = 14.5;
+//    centerTwo.x = 2545.5;
+//    centerTwo.y = 8.5;
+//    radiusOne = 14.9165;
+//    radiusTwo = 8.86012;
+
+    //test four
+//    centerOne.x = 852.5;
+//    centerOne.y = 263.5;
+//    centerTwo.x = 1027.41;
+//    centerTwo.y = 629.319;
+//    radiusOne = 13.5832;
+//    radiusTwo = 10.6686;
+
+    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
+    std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
+    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
+
+    double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double ballRealDiameter = 127;       //this is in milimeters
+
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
+
+    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
+    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
+
+    //calculate the z heights
+    double distanceXaxisBallOne = (centerOne.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallOne = (centerOne.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
+    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
+
+    double distanceXaxisBallTwo = (centerTwo.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallTwo = (centerTwo.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
+    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
+
+    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
+    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
+
+//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
+//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
+
+
+    std::cout << FRAMES_PER_SECOND << std::endl;
+    double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
+    double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
+    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
+
+    std::cout << "the x velocity is " << xVelocity <<std::endl;
+    std::cout << "The y velocity is " << yVelocity << std::endl;
+    std::cout << "The Z velocity is " << zVelocity << std::endl;
+    std::cout << "the x axis ball one " << distanceXaxisBallOne << std::endl;
+    std::cout << "the x axis ball two " << distanceXaxisBallTwo << std::endl;
+    std::cout << "the y axis ball one " << distanceYaxisBallOne << std::endl;
+    std::cout << "the y axis ball two " << distanceYaxisBallTwo << std::endl;
+    std::cout << "the z height ball one " << zHeightBallOne << std::endl;
+    std::cout << "the z height ball two " << zHeightBallTwo << std::endl;
+    std::cout << "focal length " << focalLength << std::endl;
+
+    double catchAltitude = 0;
+
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
+    double timeToFall = dronePosition.getTime(catchAltitude);
+    double xFinal = dronePosition.getFinalX(timeToFall);
+    double yFinal = dronePosition.getFinalY(timeToFall);
+
+    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+    std::cout << "The time caluclated is " << timeToFall << std::endl;
+
+
+//    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
+//    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
+//
+//    double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+//    double ballRealDiameter = 127;       //this is in milimeters
+//
+//    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
+//    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
+//
+//    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
+//    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
+//
+//    //calculate the z heights
+//    double distanceXaxisBallOne = abs(320 - centerOne.x);
+//    double distanceYaxisBallOne = abs(240- centerOne.y);
+//    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2)) * focalLength / 1000;
+//
+//    double distanceXaxisBallTwo = abs(320 - centerTwo.x);
+//    double distanceYaxisBallTwo = abs(240- centerTwo.y);
+//    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2)) * focalLength / 1000;
+//
+//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
+//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
+//
+//    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
+//    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
+//    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * 60;
+//
+//    std::cout << "the x velocity is " << xVelocity <<std::endl;
+//    std::cout << "The y velocity is " << yVelocity << std::endl;
+//    std::cout << "The Z velocity is " << zVelocity << std::endl;
+//
+//    double catchAltitude = 2;
+
+    //CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
+//    double timeToFall = dronePosition.getTime(catchAltitude);
+//    double xFinal = dronePosition.getFinalX(timeToFall);
+//    double yFinal = dronePosition.getFinalY(timeToFall);
+
+//    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+//    std::cout << "The time caluclated is " << timeToFall << std::endl;
+
 }
 
 void displayCamera() {
@@ -159,92 +291,7 @@ void findContours() {
         std::cout << "the duration after is " << duration.count() << std::endl;
     }
 
-    //test One
-//    centerOne.x = 971.447;
-//    centerOne.y = 7.13158;
-//    centerTwo.x = 973;
-//    centerTwo.y = 855;
-//    radiusOne = 8.07907;
-//    radiusTwo = 6.7083;
-
-    //testTwo
-//    centerOne.x = 1317;
-//    centerOne.y = 9;
-//    centerTwo.x = 1589.5;
-//    centerTwo.y = 1497;
-//    radiusOne = 5.0001;
-//    radiusTwo = 5.31517;
-
-    //testThree
-//    centerOne.x = 2546.5;
-//    centerOne.y = 14.5;
-//    centerTwo.x = 2545.5;
-//    centerTwo.y = 8.5;
-//    radiusOne = 14.9165;
-//    radiusTwo = 8.86012;
-
-    //test four
-//    centerOne.x = 852.5;
-//    centerOne.y = 263.5;
-//    centerTwo.x = 1027.41;
-//    centerTwo.y = 629.319;
-//    radiusOne = 13.5832;
-//    radiusTwo = 10.6686;
-
-    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
-    std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
-    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
-
-    double focalLength = 3.04;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
-    double ballRealDiameter = 127;       //this is in milimeters
-
-    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
-    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
-
-    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
-    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
-
-    //calculate the z heights
-    double distanceXaxisBallOne = (centerOne.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallOne = (centerOne.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
-    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
-
-    double distanceXaxisBallTwo = (centerTwo.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallTwo = (centerTwo.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
-    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
-
-    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
-    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
-
-//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
-//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
-
-
-    std::cout << FRAMES_PER_SECOND << std::endl;
-    double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
-    double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
-    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
-
-    std::cout << "the x velocity is " << xVelocity <<std::endl;
-    std::cout << "The y velocity is " << yVelocity << std::endl;
-    std::cout << "The Z velocity is " << zVelocity << std::endl;
-    std::cout << "the x axis ball one " << distanceXaxisBallOne << std::endl;
-    std::cout << "the x axis ball two " << distanceXaxisBallTwo << std::endl;
-    std::cout << "the y axis ball one " << distanceYaxisBallOne << std::endl;
-    std::cout << "the y axis ball two " << distanceYaxisBallTwo << std::endl;
-    std::cout << "the z height ball one " << zHeightBallOne << std::endl;
-    std::cout << "the z height ball two " << zHeightBallTwo << std::endl;
-    std::cout << "focal length " << focalLength << std::endl;
-
-    double catchAltitude = 0;
-
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
-    double timeToFall = dronePosition.getTime(catchAltitude);
-    double xFinal = dronePosition.getFinalX(timeToFall);
-    double yFinal = dronePosition.getFinalY(timeToFall);
-
-    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
-    std::cout << "The time caluclated is " << timeToFall << std::endl;
+    predictLandLocation(centerOne, centerTwo, radiusOne, radiusTwo);
 
 }
 
@@ -281,16 +328,8 @@ void convertToGrayScale() {
         }
         newFrame = grayThreshold;
 
-//        auto start = chrono::high_resolution_clock::now();
 //        cv::absdiff(oldFrame, newFrame, differenceFrame);
-//        auto end = chrono::high_resolution_clock::now();
-//        auto duration = chrono::duration_cast<chrono::microseconds>(end - start);
-//        std::cout << "the duration of absdiff " << duration.count() << std::endl;
 
-//        if(differenceFrame) {
-
-
-//        start = chrono::high_resolution_clock::now();
         HoughCircles(grayThreshold, theContours, HOUGH_GRADIENT, 1, grayThreshold.rows/64, 200, 10, 5, 15);
 //        end = chrono::high_resolution_clock::now();
 //        duration = chrono::duration_cast<chrono::microseconds>(end - start);
@@ -298,12 +337,8 @@ void convertToGrayScale() {
 //        }
 
         if(theContours.size() != 0) {
-            std::cout << "ENTERS HERE!!!" << std::endl;
-            std::cout << cntr << std::endl;
             if(cntr == 0) {
-                std::cout << "hi" << std::endl;
                 firstPoint = theContours;
-                std::cout << "yeah, thats a problem" << std::endl;
             }
             else if(cntr == 1) {
                 secondPoint = theContours;
@@ -313,7 +348,6 @@ void convertToGrayScale() {
                 break;
             }
             cntr++;
-            std::cout << "finishes up " << std::endl;
         }
 
 //        for(size_t i = 0; i < theContours.size(); i++) {
@@ -354,112 +388,7 @@ void convertToGrayScale() {
     Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
     int radiusTwo = cvRound(secondPoint[0][2]);
 
-    //test four
-    centerOne.x = 852.5;
-    centerOne.y = 263.5;
-    centerTwo.x = 1027.41;
-    centerTwo.y = 629.319;
-    radiusOne = 13.5832;
-    radiusTwo = 10.6686;
-
-    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
-    std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
-    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
-
-    double focalLength = 3.04;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
-    double ballRealDiameter = 127;       //this is in milimeters
-
-    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
-    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
-
-    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
-    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
-
-    //calculate the z heights
-    double distanceXaxisBallOne = (centerOne.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallOne = (centerOne.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
-    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
-
-    double distanceXaxisBallTwo = (centerTwo.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallTwo = (centerTwo.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
-    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
-
-    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
-    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
-
-//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXaxisBallOne, 2));
-//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXaxisBallTwo, 2));
-
-
-    std::cout << FRAMES_PER_SECOND << std::endl;
-    double xVelocity = (centerTwo.x - centerOne.x) * FRAMES_PER_SECOND * focalLength / 1000;
-    double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
-    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
-
-    std::cout << "the x velocity is " << xVelocity <<std::endl;
-    std::cout << "The y velocity is " << yVelocity << std::endl;
-    std::cout << "The Z velocity is " << zVelocity << std::endl;
-    std::cout << "the x axis ball one " << distanceXaxisBallOne << std::endl;
-    std::cout << "the x axis ball two " << distanceXaxisBallTwo << std::endl;
-    std::cout << "the y axis ball one " << distanceYaxisBallOne << std::endl;
-    std::cout << "the y axis ball two " << distanceYaxisBallTwo << std::endl;
-    std::cout << "the z height ball one " << zHeightBallOne << std::endl;
-    std::cout << "the z height ball two " << zHeightBallTwo << std::endl;
-    std::cout << "focal length " << focalLength << std::endl;
-
-    double catchAltitude = 0;
-
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
-    double timeToFall = dronePosition.getTime(catchAltitude);
-    double xFinal = dronePosition.getFinalX(timeToFall);
-    double yFinal = dronePosition.getFinalY(timeToFall);
-
-    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
-    std::cout << "The time caluclated is " << timeToFall << std::endl;
-
-
-//    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
-//    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
-//
-//    double focalLength = 3.6;           //the pi camera is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
-//    double ballRealDiameter = 127;       //this is in milimeters
-//
-//    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
-//    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
-//
-//    std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
-//    std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
-//
-//    //calculate the z heights
-//    double distanceXaxisBallOne = abs(320 - centerOne.x);
-//    double distanceYaxisBallOne = abs(240- centerOne.y);
-//    double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2)) * focalLength / 1000;
-//
-//    double distanceXaxisBallTwo = abs(320 - centerTwo.x);
-//    double distanceYaxisBallTwo = abs(240- centerTwo.y);
-//    double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2)) * focalLength / 1000;
-//
-//    double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
-//    double zHeightBallTwo = sqrt(pow(distanceToBallTwo, 2) + pow(distanceXYplaneBallTwo, 2));
-//
-//    double xVelocity = (centerTwo.x - centerOne.x) * 60 * focalLength / 1000;
-//    double yVelocity = (centerTwo.y - centerOne.y) * 60 * focalLength / 1000;
-//    double zVelocity = -(zHeightBallTwo - zHeightBallOne) * 60;
-//
-//    std::cout << "the x velocity is " << xVelocity <<std::endl;
-//    std::cout << "The y velocity is " << yVelocity << std::endl;
-//    std::cout << "The Z velocity is " << zVelocity << std::endl;
-//
-//    double catchAltitude = 2;
-
-    //CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude);      //replaced distanceToBallTwo with zHeightBallTwo
-//    double timeToFall = dronePosition.getTime(catchAltitude);
-//    double xFinal = dronePosition.getFinalX(timeToFall);
-//    double yFinal = dronePosition.getFinalY(timeToFall);
-
-//    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
-//    std::cout << "The time caluclated is " << timeToFall << std::endl;
-
+    predictLandLocation(centerOne, centerTwo, radiusOne, radiusTwo);
 }
 
 void closeCamera() {
