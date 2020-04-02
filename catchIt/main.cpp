@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc.hpp>
 #include "CalculatePosition.h"
+#include "math.h"
 //#include "test2.avi"
 
 //these next few are for testing only. Remove later to save space/speed on pi
@@ -13,6 +14,8 @@
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
+
+#define PI 3.14159265
 
 using namespace std;
 using namespace cv;
@@ -31,59 +34,115 @@ void setUpCamera() {
     cap.set(CAP_PROP_FRAME_HEIGHT, VIDEO_HEIGHT);
 }
 
+void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float radiusTwo) {
+    double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double ballRealDiameter = 127;       //this is in milimeters
+    double rightAngle = PI / 2;             //change if we are doing radians...
+    //following are going to be computed in here.
+    //for Ball One
+    double ballOne_fullDistance;    //this is the distance to directily to the ball
+    double ballOne_thetaZ;          //angle between xy plane and the vector to the ball
+    double ballOne_xyPixelValue;    //the number of pixels to the ball
+    double ballOne_xyDistance;      //this is the distance (in meters) to the ball in xy plane.
+    double ballOne_zHeight;         //this is the height of the ball in only z direction
+    double ballOne_xDistance;       //this is the distance in the X direction to the ball only
+    double ballOne_yDistance;       //this is the distance in the Y direction to the ball only
+    double ballOne_xyTheta;         //this is the angle that tan(ballOnexyTheta) = ypixel/xpixel = yDistance/xDistance
+    //for Ball Two
+    double ballTwo_fullDistance;    //this is the distance to directily to the ball
+    double ballTwo_thetaZ;          //angle between xy plane and the vector to the ball
+    double ballTwo_xyPixelValue;    //the number of pixels to the ball
+    double ballTwo_xyDistance;      //this is the distance (in meters) to the ball in xy plane.
+    double ballTwo_zHeight;         //this is the height of the ball in only z direction
+    double ballTwo_xDistance;       //this is the distance in the X direction to the ball only
+    double ballTwo_yDistance;       //this is the distance in the Y direction to the ball only
+    double ballTwo_xyTheta;         //this is the angle that tan(ballTwoxyTheta) = ypixel/xpixel = yDistance/xDistance
+    //same for both balls
+    double maxPixelAway;    //the number of pixels any of the corners are away from the center of pic
+
+    //calculate the distance to the Balls.
+    ballOne_fullDistance = (focalLength * ballRealDiameter / (2 * radiusOne)) * 0.1;       //meters
+    ballTwo_fullDistance = (focalLength * ballRealDiameter / (2 * radiusOne)) * 0.1;       //meters
+
+    //calculate thetaZ (remember, its the theta between the vector to the ball and the xy plane)
+    //in radians
+    ballOne_xyPixelValue = sqrt(pow((centerOne.x - (VIDEO_WIDTH / 2)), 2) + pow((centerOne.y - (VIDEO_HEIGHT / 2)), 2));
+    ballTwo_xyPixelValue = sqrt(pow((centerTwo.x - (VIDEO_WIDTH / 2)), 2) + pow((centerTwo.y - (VIDEO_HEIGHT / 2)), 2));
+    maxPixelAway = sqrt(pow((VIDEO_HEIGHT / 2), 2) + pow((VIDEO_WIDTH / 2), 2));
+    ballOne_thetaZ = rightAngle - (rightAngle * (ballOne_xyPixelValue / maxPixelAway));
+    ballTwo_thetaZ = rightAngle - (rightAngle * (ballTwo_xyPixelValue / maxPixelAway));
+
+    //calculate the thetaXY (remember, it is the angle that tan(ballTwoxyTheta) = ypixel/xpixel = yDistance/xDistance
+    //in radians
+    ballOne_xyTheta = atan(centerOne.y / centerOne.x);
+    ballTwo_xyTheta = atan(centerTwo.y / centerTwo.x);
+
+    //calculate the Distances now!! Boo-yah!!!!
+    ballOne_xyDistance = ballOne_fullDistance * cos(ballOne_thetaZ);
+    ballTwo_xyDistance = ballTwo_fullDistance * cos(ballTwo_thetaZ);
+
+    ballOne_zHeight = ballOne_fullDistance * sin(ballOne_thetaZ);
+    ballTwo_zHeight = ballTwo_fullDistance * sin(ballOne_thetaZ);
+
+    ballOne_xDistance = ballOne_xyDistance * cos(ballOne_xyTheta);
+    ballTwo_xDistance = ballTwo_xyDistance * cos(ballTwo_xyTheta);
+
+    ballOne_yDistance = ballOne_xyDistance * sin(ballOne_xyTheta);
+    ballTwo_yDistance = ballTwo_xyDistance * sin(ballTwo_xyTheta);
+
+
+
+}
+
 void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, float radiusTwo) {
-    //test One
-//    centerOne.x = 971.447;
-//    centerOne.y = 7.13158;
-//    centerTwo.x = 973;
-//    centerTwo.y = 855;
-//    radiusOne = 8.07907;
-//    radiusTwo = 6.7083;
-
-    //testTwo
-//    centerOne.x = 1317;
-//    centerOne.y = 9;
-//    centerTwo.x = 1589.5;
-//    centerTwo.y = 1497;
-//    radiusOne = 5.0001;
-//    radiusTwo = 5.31517;
-
-    //testThree
-//    centerOne.x = 2546.5;
-//    centerOne.y = 14.5;
-//    centerTwo.x = 2545.5;
-//    centerTwo.y = 8.5;
-//    radiusOne = 14.9165;
-//    radiusTwo = 8.86012;
-
-    //test four
-//    centerOne.x = 852.5;
-//    centerOne.y = 263.5;
-//    centerTwo.x = 1027.41;
-//    centerTwo.y = 629.319;
-//    radiusOne = 13.5832;
-//    radiusTwo = 10.6686;
+    double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double ballRealDiameter = 127;       //this is in milimeters
+    //following are going to be computed in here.
+    double thetaZ;          //angle between xy plane and the vector to the ball
+    double xyPixelValue;    //the number of pixels to the ball
+    double maxPixelAway;    //the number of pixels any of the corners are away from the center of pic
+    double xyDistance;      //this is the distance (in meters) to the ball in xy plane.
+    double zHeight;
 
     std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
     std::cout << "POint two x and y are (" << centerTwo.x << ", " << centerTwo.y << ")." << std::endl;
     std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 
-    double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
-    double ballRealDiameter = 127;       //this is in milimeters
 
-    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //millimeters
-    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //millimeters
+
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2 * radiusOne)) * 100;       //millimeters.
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 100;      //millimeters
 
     std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
 
+/*
+    new way to calculate z heights.
+    plan: take the distance to Ball One/Two as the hypotenous, two sides
+              triangle:
+                  --Hypotenous: the distance to Ball One/Two. Found above. aka "Known"
+                  --one side of triangle:the z height. Solving for. aka "unknown"
+                  --other side of triangle: the combination of x and y in that direction aka "unknown"
+                  --thetaOne: angle that touches the hypotonous and "other side of triangle" Known.
+                          --this is slightly complicated. But, true all the same.
+                          --To solve: do 90 - (90*(xyPixelValue/maxAway))
+                                --xyPixelValue: the number of pixels away from the center of picture.
+                                --maxAway: the number of pixels away any of the corners are from the picture
+
+*/
+
+
     //calculate the z heights
-    double distanceXaxisBallOne = (centerOne.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallOne = (centerOne.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
+    double distanceXaxisBallOne =
+            (centerOne.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallOne =
+            (centerOne.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486...then with 972
     double distanceXYplaneBallOne = sqrt(pow(distanceXaxisBallOne, 2) + pow(distanceYaxisBallOne, 2));
 
-    double distanceXaxisBallTwo = (centerTwo.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
-    double distanceYaxisBallTwo = (centerTwo.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
+    double distanceXaxisBallTwo =
+            (centerTwo.x - (VIDEO_WIDTH / 2)) * focalLength / 1000.0;     //replaced 320 with 648...then with 1296
+    double distanceYaxisBallTwo =
+            (centerTwo.y - (VIDEO_HEIGHT / 2)) * focalLength / 1000.0;     //replaced 240 with 486..then with 972
     double distanceXYplaneBallTwo = sqrt(pow(distanceXaxisBallTwo, 2) + pow(distanceYaxisBallTwo, 2));
 
     double zHeightBallOne = sqrt(pow(distanceToBallOne, 2) + pow(distanceXYplaneBallOne, 2));
@@ -98,7 +157,7 @@ void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, 
     double yVelocity = (centerTwo.y - centerOne.y) * FRAMES_PER_SECOND * focalLength / 1000;
     double zVelocity = -(zHeightBallTwo - zHeightBallOne) * FRAMES_PER_SECOND;
 
-    std::cout << "the x velocity is " << xVelocity <<std::endl;
+    std::cout << "the x velocity is " << xVelocity << std::endl;
     std::cout << "The y velocity is " << yVelocity << std::endl;
     std::cout << "The Z velocity is " << zVelocity << std::endl;
     std::cout << "the x axis ball one " << distanceXaxisBallOne << std::endl;
@@ -111,7 +170,9 @@ void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, 
 
     double catchAltitude = 0;
 
-    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude, distanceXaxisBallTwo, distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, zHeightBallTwo, catchAltitude,
+                                    distanceXaxisBallTwo,
+                                    distanceYaxisBallTwo);      //replaced distanceToBallTwo with zHeightBallTwo
     double timeToFall = dronePosition.getTime(catchAltitude);
     double xFinal = dronePosition.getFinalX(timeToFall);
     double yFinal = dronePosition.getFinalY(timeToFall);
@@ -120,6 +181,9 @@ void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, 
     std::cout << "The time caluclated is " << timeToFall << std::endl;
 
 
+}
+
+//the next bunch of lines is what Lorena and I had together.
 //    std::cout << "POint one x and y are (" << centerOne.x << ", " << centerOne.y << ")." << std::endl;
 //    std::cout << "radius of the two " << radiusOne << " " << radiusTwo << std::endl;
 //
@@ -162,7 +226,6 @@ void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, 
 //    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
 //    std::cout << "The time caluclated is " << timeToFall << std::endl;
 
-}
 
 void displayCamera() {
 
