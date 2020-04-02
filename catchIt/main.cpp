@@ -71,8 +71,8 @@ void predictLandLocation(Point2f centerOne, Point2f centerTwo, float radiusOne, 
     double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
     double ballRealDiameter = 127;       //this is in milimeters
 
-    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //Meters?
-    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //Meters?
+    double distanceToBallOne = (focalLength * ballRealDiameter / (2* radiusOne)) * 0.1;       //millimeters
+    double distanceToBallTwo = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;      //millimeters
 
     std::cout << "Distance to the Ball One: " << distanceToBallOne << std::endl;
     std::cout << "Distance to the Ball Two: " << distanceToBallTwo << std::endl;
