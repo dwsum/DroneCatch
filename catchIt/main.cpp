@@ -16,6 +16,9 @@
 #define VIDEO_HEIGHT 480
 
 #define PI 3.14159265
+#define FOCAL_LENGTH 3.6 //module v2 focalLength is 3. 04. module v1 is 3.6.
+#define HORIZONTAL_FIELD_OF_VIEW ((53.50 / 2) * (PI / 180))    //V1 is ((53.50 / 2) * (PI / 180)), v2 is ((62.2 / 2) * (PI / 180))
+#define VERTICAL_FIELD_OF_VIEW ((41.41 / 2)  * (PI / 180))    //v1 is ((41.41 / 2)  * (PI / 180)), v2 is ((48.8 / 2)  * (PI / 180))
 
 using namespace std;
 using namespace cv;
@@ -35,7 +38,8 @@ void setUpCamera() {
 }
 
 void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float radiusTwo) {
-    double focalLength = 3.6;            //module v2 focalLength is 3. 04. module v1 is 3.6. the web came is 6-infinity. Lets try 6. online documentation says the units on this is milimeters
+    double maxAngle_xyPlane_zAxis = atan(sqrt(pow(tan(HORIZONTAL_FIELD_OF_VIEW), 2)+pow(tan(VERTICAL_FIELD_OF_VIEW), 2)));
+    double focalLength = FOCAL_LENGTH;
     double ballRealDiameter = 127;       //this is in milimeters
     double rightAngle = PI / 2;             //change if we are doing radians...
     //following are going to be computed in here.
@@ -62,15 +66,15 @@ void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float 
 
     //calculate the distance to the Balls.
     ballOne_fullDistance = (focalLength * ballRealDiameter / (2 * radiusOne)) * 0.1;       //meters
-    ballTwo_fullDistance = (focalLength * ballRealDiameter / (2 * radiusOne)) * 0.1;       //meters
+    ballTwo_fullDistance = (focalLength * ballRealDiameter / (2 * radiusTwo)) * 0.1;       //meters
 
     //calculate thetaZ (remember, its the theta between the vector to the ball and the xy plane)
     //in radians
     ballOne_xyPixelValue = sqrt(pow((centerOne.x - (VIDEO_WIDTH / 2)), 2) + pow((centerOne.y - (VIDEO_HEIGHT / 2)), 2));
     ballTwo_xyPixelValue = sqrt(pow((centerTwo.x - (VIDEO_WIDTH / 2)), 2) + pow((centerTwo.y - (VIDEO_HEIGHT / 2)), 2));
     maxPixelAway = sqrt(pow((VIDEO_HEIGHT / 2), 2) + pow((VIDEO_WIDTH / 2), 2));
-    ballOne_thetaZ = rightAngle - (rightAngle * (ballOne_xyPixelValue / maxPixelAway));
-    ballTwo_thetaZ = rightAngle - (rightAngle * (ballTwo_xyPixelValue / maxPixelAway));
+    ballOne_thetaZ = rightAngle - (maxAngle_xyPlane_zAxis * (ballOne_xyPixelValue / maxPixelAway));
+    ballTwo_thetaZ = rightAngle - (maxAngle_xyPlane_zAxis * (ballTwo_xyPixelValue / maxPixelAway));
 
     //calculate the thetaXY (remember, it is the angle that tan(ballTwoxyTheta) = ypixel/xpixel = yDistance/xDistance
     //in radians
@@ -84,12 +88,30 @@ void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float 
     ballOne_zHeight = ballOne_fullDistance * sin(ballOne_thetaZ);
     ballTwo_zHeight = ballTwo_fullDistance * sin(ballOne_thetaZ);
 
+
+    //direction doesn't matter till here!!! Because above, is for calculating zHeight. Which is the same regardless of direction.
     ballOne_xDistance = ballOne_xyDistance * cos(ballOne_xyTheta);
     ballTwo_xDistance = ballTwo_xyDistance * cos(ballTwo_xyTheta);
 
     ballOne_yDistance = ballOne_xyDistance * sin(ballOne_xyTheta);
     ballTwo_yDistance = ballTwo_xyDistance * sin(ballTwo_xyTheta);
 
+    //add direction in.
+    //NOTE:
+    //      NEGATIVE X is code for west
+    //      NEGATIVE Y is code for North
+    if(centerOne.x < (VIDEO_WIDTH / 2)) {
+        ballOne_xDistance = -ballOne_xDistance;
+    }
+    if(centerOne.y < (VIDEO_HEIGHT / 2)) {
+        ballOne_yDistance = -ballOne_yDistance;
+    }
+    if(centerTwo.x < (VIDEO_WIDTH / 2)) {
+        ballOne_xDistance = -ballOne_xDistance;
+    }
+    if(centerTwo.y < (VIDEO_HEIGHT / 2)) {
+        ballOne_yDistance = -ballOne_yDistance;
+    }
 
     //same as end of predictLandLocation.
     std::cout << FRAMES_PER_SECOND << std::endl;
