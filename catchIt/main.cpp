@@ -38,6 +38,43 @@ void setUpCamera() {
 }
 
 void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float radiusTwo) {
+    /*Note:
+    *      for the maxAngle_xyPlane_zAxis,
+    *      it will be the max angle that the camera can have to the corner of the field of view.
+    *      To Calculate:
+    *      use three different triangles, and one rectangle.
+    *
+    *      (if don't want to look through it all, just know that z height cancels out, and the equation works :) )
+    *
+    *      Triangle 1:
+    *          Known:
+    *              side 1: z axis
+    *              side 2: x axis
+    *              tan(A1) = x / z
+    *          Calculate:
+    *              x = z * tan(A1)
+    *      Triange 2:
+    *          Known:
+    *              side 1: z axis
+    *              side 2: y axis
+    *              tan(A2) = y / z
+    *          Calculate:
+    *              y = z * tan(A2)
+    *      Rectangle
+    *          Known:
+    *              side 1: x (note, from triangle 1 x = z * tan(A1))
+    *              side 2: y (note from triangle 2: y = z * tan(A2))
+    *          Calculate:
+    *              Diagonal: rectangleDiagonal = sqrt(x^2 + y^2) = z * sqrt(tan(A2)^2 + tan(A1)^2)
+    *      Triangle 3:
+    *          Known:
+    *              Side 1: z axis
+    *              side 2: rectangle Diagonal (which we know from the rectangle rectangleDiagonal = z * sqrt(tan(A2)^2 + tan(A1)^2))
+    *              tan(answer) = rectangleDiagonal / z
+    *          Calculate:
+    *              answer = tan^-1(rectangleDiagonal / z) = tan^1(sqrt(tan(A2)^2 + tan(A1)^2))
+    *              note, the z canceled out
+    */
     double maxAngle_xyPlane_zAxis = atan(sqrt(pow(tan(HORIZONTAL_FIELD_OF_VIEW), 2)+pow(tan(VERTICAL_FIELD_OF_VIEW), 2)));
     double focalLength = FOCAL_LENGTH;
     double ballRealDiameter = 127;       //this is in milimeters
