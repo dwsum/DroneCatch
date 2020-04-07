@@ -23,8 +23,8 @@
 using namespace std;
 using namespace cv;
 
-//VideoCapture cap(0);
-VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
+VideoCapture cap(0);
+//VideoCapture cap("/home/drew/Downloads/v2-air.mp4");
 //VideoCapture cap("/home/drew/Downloads/march17.h264");
 
 
@@ -144,11 +144,14 @@ void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float 
         ballOne_yDistance = -ballOne_yDistance;
     }
     if(centerTwo.x < (VIDEO_WIDTH / 2)) {
-        ballOne_xDistance = -ballOne_xDistance;
+        ballTwo_xDistance = -ballTwo_xDistance;
     }
     if(centerTwo.y < (VIDEO_HEIGHT / 2)) {
-        ballOne_yDistance = -ballOne_yDistance;
+        ballTwo_yDistance = -ballTwo_yDistance;
     }
+
+
+
 
     //same as end of predictLandLocation.
     std::cout << FRAMES_PER_SECOND << std::endl;

@@ -15,7 +15,7 @@ private:
     double initialXVelocity;        //want in meters/second--should be constant!
     double initialYVelocity;        //want in meters/second--should be constant! to small for air resistance
     double initialZVelocity;        //want in meters/second
-    double distanceToBall;          //in meters...Drew stored the initial Z Height here though.
+    double initialZHeight;          //in meters...Drew stored the initial Z Height here though.
     double droneHeight;             //height drone is at?
     double initialXPosition;        //meters
     double initialYPosition;        //meters
@@ -29,7 +29,7 @@ public:
         initialXVelocity = initialX;
         initialYVelocity = initialY;
         initialZVelocity = initialZ;
-        this->distanceToBall = distanceToBall;
+        this->initialZHeight = distanceToBall;
         this->droneHeight = droneHeight;
         initialXPosition = xPosition;
         initialYPosition = yPosition;
@@ -39,7 +39,7 @@ public:
 //        double timeOne;
 //        double timeTwo;
 //        double initialVzSquared = pow(initialZVelocity, 2);
-//        double altDiff = (distanceToBall + droneHeight) - landingAltitude;
+//        double altDiff = (initialZHeight + droneHeight) - landingAltitude;
 //        double radical = sqrt(initialVzSquared + (4*4.9*altDiff)); //these numbers are from the quadric equation using the projectile motion formula
 //        timeOne = (-initialZVelocity + radical) / 9.8;
 //        timeTwo = (-initialZVelocity - radical) / 9.8;
@@ -47,8 +47,11 @@ public:
 //            return timeOne;
 //        return timeTwo;
 
-        double finalTime = (-initialZVelocity + sqrt(2*(-distanceToBall)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
-        double finalTime2 = (-initialZVelocity - sqrt(2*(-distanceToBall)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
+//        double finalTime = (-initialZVelocity + sqrt(2*(-initialZHeight)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
+//        double finalTime2 = (-initialZVelocity - sqrt(2*(-initialZHeight)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
+//
+        double finalTime = (initialZVelocity + sqrt(2*(-initialZHeight)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
+        double finalTime2 = (initialZVelocity - sqrt(2*(-initialZHeight)*(-9.81)+pow(initialZVelocity, 2)))/-9.81;
 
         std::cout << "THE TIMES" << finalTime << " " << finalTime2 << std::endl;
         return finalTime2;
