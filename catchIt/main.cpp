@@ -9,7 +9,7 @@
 //these next few are for testing only. Remove later to save space/speed on pi
 #include <chrono>
 
-#define CHOSEN_WINDOW 75 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
+#define CHOSEN_WINDOW 85 //350 for pi, 60 for computer          //note in milliseconds. NOTE: This is milliseconds per frame
 #define FRAMES_PER_SECOND ((1.0 / CHOSEN_WINDOW) * 1000)        //note, this is the frames per second used in some caluclations
 
 #define VIDEO_WIDTH 640
