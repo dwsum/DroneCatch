@@ -91,6 +91,35 @@ void calculateLand(Point2f centerOne, Point2f centerTwo, float radiusOne, float 
     ballTwo_yDistance = ballTwo_xyDistance * sin(ballTwo_xyTheta);
 
 
+    //same as end of predictLandLocation.
+    std::cout << FRAMES_PER_SECOND << std::endl;
+    double xVelocity = (ballTwo_xDistance - ballOne_xDistance) * FRAMES_PER_SECOND;
+    double yVelocity = (ballTwo_yDistance - ballOne_yDistance) * FRAMES_PER_SECOND;
+    double zVelocity = -(ballTwo_zHeight - ballOne_zHeight) * FRAMES_PER_SECOND;
+
+    std::cout << "the x velocity is " << xVelocity << std::endl;
+    std::cout << "The y velocity is " << yVelocity << std::endl;
+    std::cout << "The Z velocity is " << zVelocity << std::endl;
+    std::cout << "the x axis ball one " << ballOne_xDistance << std::endl;
+    std::cout << "the x axis ball two " << ballTwo_xDistance << std::endl;
+    std::cout << "the y axis ball one " << ballOne_yDistance << std::endl;
+    std::cout << "the y axis ball two " << ballTwo_yDistance << std::endl;
+    std::cout << "the z height ball one " << ballOne_zHeight << std::endl;
+    std::cout << "the z height ball two " << ballTwo_zHeight << std::endl;
+    std::cout << "focal length " << focalLength << std::endl;
+
+    double catchAltitude = 0;
+
+    CalculatePosition dronePosition(xVelocity, yVelocity, zVelocity, ballTwo_zHeight, catchAltitude,
+                                    ballTwo_xDistance,
+                                    ballTwo_yDistance);      //replaced distanceToBallTwo with zHeightBallTwo
+    double timeToFall = dronePosition.getTime(catchAltitude);
+    double xFinal = dronePosition.getFinalX(timeToFall);
+    double yFinal = dronePosition.getFinalY(timeToFall);
+
+    std::cout << "The final landing position is at (" << xFinal << ", " << yFinal << ")" << std::endl;
+    std::cout << "The time caluclated is " << timeToFall << std::endl;
+
 
 }
 
@@ -451,7 +480,7 @@ void convertToGrayScale() {
     Point centerTwo(cvRound(secondPoint[0][0]), cvRound(secondPoint[0][1]));
     int radiusTwo = cvRound(secondPoint[0][2]);
 
-    predictLandLocation(centerOne, centerTwo, radiusOne, radiusTwo);
+    calculateLand(centerOne, centerTwo, radiusOne, radiusTwo);
 }
 
 void closeCamera() {
